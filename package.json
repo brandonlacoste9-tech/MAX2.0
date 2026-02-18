@@ -1,0 +1,36 @@
+{
+  "name": "max-ai-assistant",
+  "version": "2.0.0",
+  "description": "MAX - The AI assistant and guru on Floguru.com",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint src --ext .ts",
+    "dev": "ts-node src/index.ts"
+  },
+  "keywords": [
+    "ai",
+    "assistant",
+    "chatbot",
+    "multi-language",
+    "multi-channel"
+  ],
+  "author": "Floguru",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.6.0"
+  }
+}
