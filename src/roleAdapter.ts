@@ -69,7 +69,7 @@ export class RoleAdapter {
     }
 
     // Advertising keywords
-    if (lowerMessage.match(/\b(advertis|advertising|market|marketing|campaign|brand|promotion|ad|seo|social\s*media)\b/)) {
+    if (lowerMessage.match(/\b(advertis|advertising|advertise|market|marketing|campaign|brand|promotion|ad|seo|social\s*media)\b/)) {
       return Role.ADVERTISER;
     }
 
