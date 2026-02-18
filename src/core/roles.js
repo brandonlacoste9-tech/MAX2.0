@@ -97,7 +97,7 @@ export function detectRole(query) {
   }
   
   // Marketing/advertising keywords
-  if (lowerQuery.match(/\b(market|advertis|brand|campaign|social media|promote|seo|content|improve.*campaign)\b/)) {
+  if (lowerQuery.match(/\b(market|advertis|brand|campaign|social media|promote|seo|content)\b/)) {
     return 'advertiser';
   }
   

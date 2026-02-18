@@ -290,7 +290,20 @@ Expected response: `{"status":"healthy"}`
 1. **Never commit `.env` files**
 2. **Use HTTPS in production**
 3. **Rotate API keys regularly**
-4. **Implement rate limiting**
+4. **Implement rate limiting** - Add express-rate-limit middleware to prevent API abuse:
+   ```bash
+   npm install express-rate-limit
+   ```
+   ```javascript
+   import rateLimit from 'express-rate-limit';
+   
+   const limiter = rateLimit({
+     windowMs: 15 * 60 * 1000, // 15 minutes
+     max: 100 // limit each IP to 100 requests per windowMs
+   });
+   
+   app.use('/api/', limiter);
+   ```
 5. **Monitor API usage**
 6. **Use environment-specific configs**
 

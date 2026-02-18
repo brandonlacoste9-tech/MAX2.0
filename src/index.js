@@ -71,6 +71,7 @@ app.get('/api/info', (req, res) => {
 });
 
 // Chat endpoint - main interaction point
+// TODO: Add rate limiting for production use to prevent abuse
 app.post('/api/chat', async (req, res) => {
   try {
     const { userId, message, language, role, channel = 'website' } = req.body;
@@ -225,6 +226,7 @@ app.delete('/api/history/:userId', async (req, res) => {
 });
 
 // Text-to-speech endpoint
+// TODO: Add rate limiting for production use to prevent abuse
 app.post('/api/tts', async (req, res) => {
   try {
     const { text, voiceOptions } = req.body;
