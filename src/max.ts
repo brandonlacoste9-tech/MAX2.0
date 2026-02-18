@@ -168,6 +168,7 @@ export class MAX {
     userMessage: string,
     role: Role,
     language: Language,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     history: Message[]
   ): string {
     // This is a simplified response generator
@@ -176,7 +177,7 @@ export class MAX {
     const roleGreeting = this.roleAdapter.getRoleGreeting(role, language);
     
     // Build context-aware response
-    const recentHistory = history.slice(-5); // Last 5 messages for context
+    // Note: history available for future context-aware improvements
     
     // Return a contextual response based on personality traits
     const responses: Record<Language, string> = {

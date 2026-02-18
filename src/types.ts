@@ -40,7 +40,7 @@ export interface UserContext {
   language: Language;
   preferredRole?: Role;
   conversationHistory: Message[];
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
 }
 
 /**

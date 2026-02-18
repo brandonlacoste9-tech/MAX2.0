@@ -18,7 +18,7 @@ async function multiLanguageExample() {
 
   // Quebec French
   console.log('2. Quebec French:');
-  const french = await max.processMessage('user-fr', 'Je besoin aide avec ma santé');
+  const french = await max.processMessage('user-fr', "J'ai besoin d'aide avec ma santé");
   console.log(`   Language: ${french.language}`);
   console.log(`   Role: ${french.role}`);
   console.log(`   Response: ${french.message}`);

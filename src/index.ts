@@ -12,5 +12,5 @@ export { MemoryManager } from './memory';
 export { LanguageDetector } from './languageDetector';
 export { RoleAdapter } from './roleAdapter';
 export { ChannelManager } from './channels';
-export { ElevenLabsTTS, ElevenLabsConfig } from './tts';
+export { ElevenLabsTTS, ElevenLabsConfig, Voice } from './tts';
 export { GREETINGS, PERSONALITY_TRAITS } from './constants';

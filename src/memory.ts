@@ -1,4 +1,4 @@
-import { UserContext, Message } from './types';
+import { UserContext, Message, Language } from './types';
 
 /**
  * Memory system for MAX - remembers everything about each user
@@ -13,11 +13,11 @@ export class MemoryManager {
   /**
    * Get user context or create a new one
    */
-  getUserContext(userId: string, defaultLanguage = 'en'): UserContext {
+  getUserContext(userId: string, defaultLanguage: Language = Language.ENGLISH): UserContext {
     if (!this.userContexts.has(userId)) {
       this.userContexts.set(userId, {
         userId,
-        language: defaultLanguage as any,
+        language: defaultLanguage,
         conversationHistory: [],
         metadata: {}
       });
@@ -51,7 +51,7 @@ export class MemoryManager {
   /**
    * Store user metadata
    */
-  setMetadata(userId: string, key: string, value: any): void {
+  setMetadata(userId: string, key: string, value: unknown): void {
     const context = this.getUserContext(userId);
     context.metadata[key] = value;
   }
@@ -59,7 +59,7 @@ export class MemoryManager {
   /**
    * Retrieve user metadata
    */
-  getMetadata(userId: string, key: string): any {
+  getMetadata(userId: string, key: string): unknown {
     return this.getUserContext(userId).metadata[key];
   }
 

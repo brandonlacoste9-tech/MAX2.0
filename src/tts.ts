@@ -1,6 +1,18 @@
 import axios from 'axios';
 
 /**
+ * ElevenLabs voice information
+ */
+export interface Voice {
+  voice_id: string;
+  name: string;
+  category?: string;
+  labels?: Record<string, string>;
+  description?: string;
+  preview_url?: string;
+}
+
+/**
  * ElevenLabs TTS configuration
  */
 export interface ElevenLabsConfig {
@@ -64,7 +76,7 @@ export class ElevenLabsTTS {
   /**
    * Get available voices
    */
-  async getVoices(): Promise<any[]> {
+  async getVoices(): Promise<Voice[]> {
     if (!this.apiKey) {
       return [];
     }
