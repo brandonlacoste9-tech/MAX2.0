@@ -96,14 +96,14 @@ export function detectRole(query) {
     return 'fitness';
   }
   
+  // Marketing/advertising keywords
+  if (lowerQuery.match(/\b(market|advertis|brand|campaign|social media|promote|seo|content|improve.*campaign)\b/)) {
+    return 'advertiser';
+  }
+  
   // Life coach keywords
   if (lowerQuery.match(/\b(goal|career|motivation|life coach|personal development|success|improve)\b/)) {
     return 'coach';
-  }
-  
-  // Marketing/advertising keywords
-  if (lowerQuery.match(/\b(market|advertis|brand|campaign|social media|promote|seo|content)\b/)) {
-    return 'advertiser';
   }
   
   // Default to general

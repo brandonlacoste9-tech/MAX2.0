@@ -48,7 +48,7 @@ export function detectLanguage(text, providedLang = null) {
   }
   
   // Brazilian Portuguese detection
-  if (lowerText.match(/\b(olá|obrigado|obrigada|por favor|ajuda|posso|você)\b/)) {
+  if (lowerText.match(/\b(olá|ola|obrigado|obrigada|por favor|ajuda|posso|você|voce)\b/)) {
     return 'pt-br';
   }
   
