@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Browser | MAX</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #050508;
+            --bg-secondary: #0a0a0f;
+            --bg-tertiary: #12121a;
+            --accent-cyan: #00d4ff;
+            --accent-purple: #7c3aed;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 20px;
+        }
+
+        .logo-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 16px 12px;
+            overflow-y: auto;
+        }
+
+        .nav-section {
+            margin-bottom: 24px;
+        }
+
+        .nav-section-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            padding: 0 12px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 4px;
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--glass);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            border-left: 3px solid var(--accent-cyan);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .top-bar {
+            height: 64px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+        }
+
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-title h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+        }
+
+        .page-title p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .top-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--glass);
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 212, 255, 0.2);
+        }
+
+        /* File Browser Layout */
+        .browser-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* File Sidebar */
+        .file-sidebar {
+            width: 250px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--glass-border);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .storage-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .storage-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .storage-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 212, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-cyan);
+            font-size: 20px;
+        }
+
+        .storage-info h3 {
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .storage-info p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .storage-bar {
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .storage-fill {
+            height: 100%;
+            width: 65%;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 4px;
+        }
+
+        .storage-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-align: right;
+        }
+
+        .quick-access {
+            margin-top: 30px;
+        }
+
+        .quick-access h3 {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .quick-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            transition: all 0.2s;
+        }
+
+        .quick-item:hover {
+            background: var(--glass);
+            color: var(--text-primary);
+        }
+
+        .quick-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main File Area */
+        .file-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .file-toolbar {
+            height: 60px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            gap: 16px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .breadcrumb-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .breadcrumb-item:hover {
+            color: var(--accent-cyan);
+        }
+
+        .breadcrumb-item.active {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .toolbar-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .toolbar-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .toolbar-btn:hover {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+        }
+
+        .file-grid {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .file-item {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .file-item:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.1);
+        }
+
+        .file-item.selected {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .file-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+
+        .file-icon.folder { color: var(--accent-cyan); }
+        .file-icon.image { color: var(--accent-purple); }
+        .file-icon.code { color: var(--accent-green); }
+        .file-icon.document { color: var(--accent-orange); }
+
+        .file-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .file-checkbox {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid var(--glass-border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.2s;
+        }
+
+        .file-item:hover .file-checkbox,
+        .file-item.selected .file-checkbox {
+            opacity: 1;
+        }
+
+        .file-item.selected .file-checkbox {
+            background: var(--accent-cyan);
+            border-color: var(--accent-cyan);
+        }
+
+        .file-checkbox i {
+            opacity: 0;
+            font-size: 12px;
+            color: white;
+        }
+
+        .file-item.selected .file-checkbox i {
+            opacity: 1;
+        }
+
+        /* Context Menu */
+        .context-menu {
+            position: fixed;
+            background: var(--bg-secondary);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 8px;
+            min-width: 180px;
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.95);
+            transition: all 0.1s;
+            z-index: 1000;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .context-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+        }
+
+        .context-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .context-item:hover {
+            background: var(--glass);
+            color: var(--text-primary);
+        }
+
+        .context-item.delete:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        /* AI Assistant Panel */
+        .ai-panel {
+            width: 350px;
+            background: var(--bg-secondary);
+            border-left: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ai-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .ai-header h3 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+        }
+
+        .ai-header p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .ai-chat {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .ai-message {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .ai-message strong {
+            color: var(--accent-cyan);
+        }
+
+        .ai-input-area {
+            padding: 20px;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .ai-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 14px;
+            outline: none;
+            resize: none;
+        }
+
+        .ai-input:focus {
+            border-color: var(--accent-cyan);
+        }
+
+        .ai-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .ai-btn {
+            flex: 1;
+            padding: 8px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ai-btn:hover {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+        }
+
+        @media (max-width: 1024px) {
+            .ai-panel { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">M</div>
+                    <div class="logo-text">MAX</div>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="command-center.html" class="nav-item">
+                        <i class="fas fa-home"></i>
+                        <span>Command Center</span>
+                    </a>
+                    <a href="#" class="nav-item active">
+                        <i class="fas fa-folder-open"></i>
+                        <span>File Browser</span>
+                    </a>
+                    <a href="personality-editor.html" class="nav-item">
+                        <i class="fas fa-user-cog"></i>
+                        <span>Personality</span>
+                    </a>
+                    <a href="memory-settings.html" class="nav-item">
+                        <i class="fas fa-brain"></i>
+                        <span>Memory</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div class="page-title">
+                    <h1><i class="fas fa-folder-open" style="color: var(--accent-cyan); margin-right: 12px;"></i>File Browser</h1>
+                    <p>Your AI can read, write, and organize files</p>
+                </div>
+                <div class="top-actions">
+                    <button class="btn btn-secondary" onclick="uploadFile()">
+                        <i class="fas fa-upload"></i>
+                        Upload
+                    </button>
+                    <button class="btn btn-primary" onclick="newFolder()">
+                        <i class="fas fa-folder-plus"></i>
+                        New Folder
+                    </button>
+                </div>
+            </header>
+
+            <!-- Browser Container -->
+            <div class="browser-container">
+                <!-- File Sidebar -->
+                <aside class="file-sidebar">
+                    <div class="storage-card">
+                        <div class="storage-header">
+                            <div class="storage-icon">
+                                <i class="fas fa-hdd"></i>
+                            </div>
+                            <div class="storage-info">
+                                <h3>Local Storage</h3>
+                                <p>SSD Drive</p>
+                            </div>
+                        </div>
+                        <div class="storage-bar">
+                            <div class="storage-fill"></div>
+                        </div>
+                        <div class="storage-text">650 GB / 1 TB used</div>
+                    </div>
+
+                    <div class="quick-access">
+                        <h3>Quick Access</h3>
+                        <div class="quick-item" onclick="navigateTo('desktop')">
+                            <i class="fas fa-desktop"></i>
+                            <span>Desktop</span>
+                        </div>
+                        <div class="quick-item" onclick="navigateTo('downloads')">
+                            <i class="fas fa-download"></i>
+                            <span>Downloads</span>
+                        </div>
+                        <div class="quick-item" onclick="navigateTo('documents')">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Documents</span>
+                        </div>
+                        <div class="quick-item" onclick="navigateTo('projects')">
+                            <i class="fas fa-code"></i>
+                            <span>Projects</span>
+                        </div>
+                        <div class="quick-item" onclick="navigateTo('ai-generated')">
+                            <i class="fas fa-magic"></i>
+                            <span>AI Generated</span>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Main File Area -->
+                <div class="file-main">
+                    <div class="file-toolbar">
+                        <div class="breadcrumb">
+                            <div class="breadcrumb-item" onclick="navigateTo('home')">
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <i class="fas fa-chevron-right" style="color: var(--text-secondary); font-size: 12px;"></i>
+                            <div class="breadcrumb-item" onclick="navigateTo('documents')">
+                                <span>Documents</span>
+                            </div>
+                            <i class="fas fa-chevron-right" style="color: var(--text-secondary); font-size: 12px;"></i>
+                            <div class="breadcrumb-item active">
+                                <span>MAX Projects</span>
+                            </div>
+                        </div>
+                        <div class="toolbar-actions">
+                            <button class="toolbar-btn" onclick="viewGrid()" title="Grid View">
+                                <i class="fas fa-th"></i>
+                            </button>
+                            <button class="toolbar-btn" onclick="viewList()" title="List View">
+                                <i class="fas fa-list"></i>
+                            </button>
+                            <button class="toolbar-btn" onclick="sortFiles()" title="Sort">
+                                <i class="fas fa-sort"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="file-grid" id="fileGrid">
+                        <!-- Folders -->
+                        <div class="file-item" onclick="selectFile(this)" ondblclick="openFolder('ai-agents')" oncontextmenu="showContextMenu(event, this)">
+                            <div class="file-checkbox" onclick="event.stopPropagation(); toggleSelect(this)">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="file-icon folder">
+                                <i class="fas fa-folder"></i>
+                            </div>
+                            <div class="file-name">AI Agents</div>
+                            <div class="file-meta">8 items • 2.4 MB</div>
+                        </div>
+
+                        <div class="file-item" onclick="selectFile(this)" ondblclick="openFolder('generated-code')" oncontextmenu="showContextMenu(event, this)">
+                            <div class="file-checkbox" onclick="event.stopPropagation(); toggleSelect(this)">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="file-icon folder">
+                                <i class="fas fa-folder"></i>
+                            </div>
+                            <div class="file-name">Generated Code</div>
+                            <div class="file-meta">24 items • 15 MB</div>
+                        </div>
+
+                        <div class="file-item" onclick="selectFile(this)" ondblclick="openFolder('images')" oncontextmenu="showContextMenu(event, this)">
+                            <div class="file-checkbox" onclick="event.stopPropagation(); toggleSelect(this)">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="file-icon folder">
+                                <i class="fas fa-folder"></i>
+                            </div>
+                            <div class="file-name">Images</div>
+                            <div class="file-meta">156 items • 1.2 GB</div>
+                        </div>
+
+                        <!-- Files -->
+                        <div class="file-item" onclick="selectFile(this)" oncontextmenu="showContextMenu(event, this)">
+                            <div class="file-checkbox" onclick="event.stopPropagation(); toggleSelect(this)">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="file-icon code">
+                                <i class="fas fa-file-code"></i>
+                            </div>
+                            <div class="file-name">app.py</div>
+                            <div class="file-meta">24 KB • Modified 2h ago</div>
+                        </div>
+
+                        <div class="file-item" onclick="selectFile(this)" oncontextmenu="showContextMenu(event, this)">
+                            <div class="file-checkbox" onclick="event.stopPropagation(); toggleSelect(this)">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="file-icon document">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="file-name">README.md</div>
+                            <div class="file-meta">4 KB • Modified yesterday</div>
+                        </div>
+
+                        <div class="file-item" onclick="selectFile(this)" oncontextmenu="showContextMenu(event, this)">
+                            <div class="file-checkbox" onclick="event.stopPropagation(); toggleSelect(this)">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="file-icon image">
+                                <i class="fas fa-file-image"></i>
+                            </div>
+                            <div class="file-name">hero-banner.png</div>
+                            <div class="file-meta">2.4 MB • Modified 3d ago</div>
+                        </div>
+
+                        <div class="file-item" onclick="selectFile(this)" oncontextmenu="showContextMenu(event, this)">
+                            <div class="file-checkbox" onclick="event.stopPropagation(); toggleSelect(this)">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="file-icon code">
+                                <i class="fas fa-file-code"></i>
+                            </div>
+                            <div class="file-name">config.json</div>
+                            <div class="file-meta">1 KB • Modified 5m ago</div>
+                        </div>
+
+                        <div class="file-item" onclick="selectFile(this)" oncontextmenu="showContextMenu(event, this)">
+                            <div class="file-checkbox" onclick="event.stopPropagation(); toggleSelect(this)">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="file-icon document">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="file-name">notes.txt</div>
+                            <div class="file-meta">2 KB • Modified 1w ago</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Panel -->
+                <aside class="ai-panel">
+                    <div class="ai-header">
+                        <h3><i class="fas fa-robot" style="color: var(--accent-cyan);"></i> AI Assistant</h3>
+                        <p>Ask MAX to organize, edit, or analyze files</p>
+                    </div>
+                    
+                    <div class="ai-chat" id="aiChat">
+                        <div class="ai-message">
+                            <strong>MAX:</strong> I can see you're in the MAX Projects folder. Would you like me to organize these files by type, or help you with any specific file?
+                        </div>
+                    </div>
+
+                    <div class="ai-input-area">
+                        <textarea class="ai-input" rows="3" placeholder="Ask me to organize files, write code, etc... (Enter to send)" id="aiInput"></textarea>
+                        <div class="ai-actions">
+                            <button class="ai-btn" onclick="aiAction('organize')">
+                                <i class="fas fa-sort"></i> Organize
+                            </button>
+                            <button class="ai-btn" onclick="aiAction('analyze')">
+                                <i class="fas fa-search"></i> Analyze
+                            </button>
+                            <button class="ai-btn" onclick="aiAction('backup')">
+                                <i class="fas fa-save"></i> Backup
+                            </button>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </main>
+    </div>
+
+    <!-- Context Menu -->
+    <div class="context-menu" id="contextMenu">
+        <div class="context-item" onclick="openFile()">
+            <i class="fas fa-folder-open"></i>
+            <span>Open</span>
+        </div>
+        <div class="context-item" onclick="renameFile()">
+            <i class="fas fa-edit"></i>
+            <span>Rename</span>
+        </div>
+        <div class="context-item" onclick="copyFile()">
+            <i class="fas fa-copy"></i>
+            <span>Copy</span>
+        </div>
+        <div class="context-item" onclick="moveFile()">
+            <i class="fas fa-arrows-alt"></i>
+            <span>Move</span>
+        </div>
+        <div class="context-item delete" onclick="deleteFile()">
+            <i class="fas fa-trash"></i>
+            <span>Delete</span>
+        </div>
+    </div>
+
+    <script>
+        let selectedFileItem = null;
+
+        // File selection
+        function selectFile(element) {
+            document.querySelectorAll('.file-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            selectedFileItem = element;
+        }
+
+        function toggleSelect(checkbox) {
+            const item = checkbox.closest('.file-item');
+            item.classList.toggle('selected');
+        }
+
+        // Navigation
+        function navigateTo(location) {
+            console.log('Navigating to:', location);
+        }
+
+        function openFolder(folder) {
+            console.log('Opening folder:', folder);
+            addAiMessage(`<strong>MAX:</strong> Opening ${folder}...`);
+        }
+
+        // AI Actions
+        function aiAction(type) {
+            const chat = document.getElementById('aiChat');
+            const input = document.getElementById('aiInput');
+            const message = input.value.trim();
+            
+            const responses = {
+                organize: '<strong>MAX:</strong> I\'ll organize these files by type. Creating folders for Images, Code, and Documents... Done! Files organized.',
+                analyze: '<strong>MAX:</strong> Analyzing directory... Found 8 folders, 156 files (1.2 GB total). Largest file: hero-banner.png (2.4 MB)',
+                backup: '<strong>MAX:</strong> Creating backup of current directory... Compressed 1.2 GB into 890 MB backup file. Saved to /backups/2024/'
+            };
+
+            addAiMessage(message ? `<strong>You:</strong> ${escapeHtml(message)}<br><br>${responses[type] || 'I\'ll help you with that.'}` : responses[type]);
+            input.value = '';
+        }
+
+        function addAiMessage(html) {
+            const chat = document.getElementById('aiChat');
+            const div = document.createElement('div');
+            div.className = 'ai-message';
+            div.innerHTML = html;
+            chat.appendChild(div);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // AI input: Enter to send, Shift+Enter for newline
+        document.getElementById('aiInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                const input = document.getElementById('aiInput');
+                if (input.value.trim()) {
+                    addAiMessage(`<strong>You:</strong> ${escapeHtml(input.value)}<br><br><strong>MAX:</strong> I'll help you with that. In the full version, this would connect to your local AI.`);
+                    input.value = '';
+                }
+            }
+        });
+
+        // Toolbar actions
+        function uploadFile() {
+            alert('File upload dialog would open');
+        }
+
+        function newFolder() {
+            const name = prompt('Enter folder name:');
+            if (name) {
+                addAiMessage(`<strong>MAX:</strong> Created folder "${name}"`);
+            }
+        }
+
+        function viewGrid() {
+            document.getElementById('fileGrid').style.gridTemplateColumns = 'repeat(auto-fill, minmax(200px, 1fr))';
+        }
+
+        function viewList() {
+            document.getElementById('fileGrid').style.gridTemplateColumns = '1fr';
+        }
+
+        function sortFiles() {
+            alert('Sort options: Name, Size, Date Modified');
+        }
+
+        // Context menu
+        function showContextMenu(e, item) {
+            e.preventDefault();
+            selectedFileItem = item;
+            const menu = document.getElementById('contextMenu');
+            menu.style.left = e.clientX + 'px';
+            menu.style.top = e.clientY + 'px';
+            menu.classList.add('show');
+        }
+
+        document.addEventListener('contextmenu', (e) => {
+            if (!e.target.closest('.file-item')) {
+                document.getElementById('contextMenu').classList.remove('show');
+            }
+        });
+
+        document.addEventListener('click', () => {
+            document.getElementById('contextMenu').classList.remove('show');
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.getElementById('contextMenu').classList.remove('show');
+            }
+        });
+
+        function openFile() {
+            document.getElementById('contextMenu').classList.remove('show');
+            if (selectedFileItem) {
+                const name = selectedFileItem.querySelector('.file-name').textContent;
+                alert('Opening: ' + name);
+            }
+        }
+
+        function renameFile() {
+            document.getElementById('contextMenu').classList.remove('show');
+            const newName = prompt('Enter new name:');
+            if (newName && selectedFileItem) {
+                selectedFileItem.querySelector('.file-name').textContent = newName;
+            }
+        }
+
+        function copyFile() {
+            document.getElementById('contextMenu').classList.remove('show');
+            alert('File copied to clipboard');
+        }
+
+        function moveFile() {
+            document.getElementById('contextMenu').classList.remove('show');
+            alert('Move dialog would open');
+        }
+
+        function deleteFile() {
+            document.getElementById('contextMenu').classList.remove('show');
+            if (confirm('Are you sure you want to delete this file?')) {
+                if (selectedFileItem) {
+                    selectedFileItem.remove();
+                }
+            }
+        }
+    </script>
+</body>
+</html>

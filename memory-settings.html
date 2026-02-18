@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Settings | MAX</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #050508;
+            --bg-secondary: #0a0a0f;
+            --bg-tertiary: #12121a;
+            --accent-cyan: #00d4ff;
+            --accent-purple: #7c3aed;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 20px;
+        }
+
+        .logo-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 16px 12px;
+        }
+
+        .nav-section {
+            margin-bottom: 24px;
+        }
+
+        .nav-section-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            padding: 0 12px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 4px;
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--glass);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            border-left: 3px solid var(--accent-cyan);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .top-bar {
+            height: 64px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+        }
+
+        .page-title h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-title p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .top-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--glass);
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-red);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 212, 255, 0.2);
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 10px 20px rgba(239, 68, 68, 0.2);
+        }
+
+        /* Settings Layout */
+        .settings-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Cards */
+        .settings-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .card-icon.blue { background: rgba(0, 212, 255, 0.1); color: var(--accent-cyan); }
+        .card-icon.green { background: rgba(16, 185, 129, 0.1); color: var(--accent-green); }
+        .card-icon.orange { background: rgba(245, 158, 11, 0.1); color: var(--accent-orange); }
+        .card-icon.red { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); }
+
+        .card-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .card-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Storage Stats */
+        .storage-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-box {
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .storage-bar {
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .storage-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 4px;
+            width: 16%;
+        }
+
+        .storage-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-align: right;
+        }
+
+        /* Toggle Items */
+        .toggle-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .toggle-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+        }
+
+        .toggle-info h4 {
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .toggle-info p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .toggle-switch {
+            width: 50px;
+            height: 26px;
+            background: var(--glass);
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid var(--glass-border);
+        }
+
+        .toggle-switch.active {
+            background: var(--accent-cyan);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s;
+        }
+
+        .toggle-switch.active::after {
+            left: 26px;
+        }
+
+        /* Privacy Levels */
+        .privacy-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .privacy-option {
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .privacy-option:hover {
+            border-color: var(--glass-border);
+        }
+
+        .privacy-option.selected {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .privacy-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .privacy-radio {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--text-secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .privacy-option.selected .privacy-radio {
+            border-color: var(--accent-cyan);
+            background: var(--accent-cyan);
+        }
+
+        .privacy-radio::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0;
+        }
+
+        .privacy-option.selected .privacy-radio::after {
+            opacity: 1;
+        }
+
+        .privacy-name {
+            font-weight: 600;
+        }
+
+        .privacy-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-left: 32px;
+        }
+
+        /* Data Actions */
+        .data-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 15px;
+            width: 100%;
+            text-align: left;
+        }
+
+        .action-btn:hover {
+            border-color: var(--accent-cyan);
+            background: var(--glass);
+        }
+
+        .action-btn i:first-child {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--glass);
+            border-radius: 10px;
+            color: var(--accent-cyan);
+        }
+
+        .action-btn.danger i:first-child {
+            color: var(--accent-red);
+        }
+
+        .action-btn.danger:hover {
+            border-color: var(--accent-red);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .action-info {
+            flex: 1;
+        }
+
+        .action-title {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .action-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Full Width Card */
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+            .full-width {
+                grid-column: 1;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .storage-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">M</div>
+                    <div class="logo-text">MAX</div>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="command-center.html" class="nav-item">
+                        <i class="fas fa-home"></i>
+                        <span>Command Center</span>
+                    </a>
+                    <a href="file-browser.html" class="nav-item">
+                        <i class="fas fa-folder-open"></i>
+                        <span>File Browser</span>
+                    </a>
+                    <a href="personality-editor.html" class="nav-item">
+                        <i class="fas fa-user-cog"></i>
+                        <span>Personality</span>
+                    </a>
+                    <a href="#" class="nav-item active">
+                        <i class="fas fa-brain"></i>
+                        <span>Memory</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div class="page-title">
+                    <h1><i class="fas fa-brain" style="color: var(--accent-cyan); margin-right: 12px;"></i>Memory & Privacy</h1>
+                    <p>Control how MAX remembers and stores your data</p>
+                </div>
+                <div class="top-actions">
+                    <button class="btn btn-secondary" onclick="exportData()">
+                        <i class="fas fa-download"></i>
+                        Export Data
+                    </button>
+                    <button class="btn btn-primary" onclick="saveSettings()">
+                        <i class="fas fa-save"></i>
+                        Save Settings
+                    </button>
+                </div>
+            </header>
+
+            <!-- Settings Container -->
+            <div class="settings-container">
+                <div class="settings-grid">
+                    <!-- Storage Overview -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <div class="card-icon blue">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <div>
+                                <div class="card-title">Storage Overview</div>
+                                <div class="card-subtitle">Local database usage</div>
+                            </div>
+                        </div>
+                        
+                        <div class="storage-stats">
+                            <div class="stat-box">
+                                <div class="stat-value">2.4</div>
+                                <div class="stat-label">GB Used</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value">847</div>
+                                <div class="stat-label">Conversations</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value">12</div>
+                                <div class="stat-label">Agents</div>
+                            </div>
+                        </div>
+
+                        <div class="storage-bar">
+                            <div class="storage-fill"></div>
+                        </div>
+                        <div class="storage-text">2.4 GB of 15 GB used (16%)</div>
+                    </div>
+
+                    <!-- Privacy Level -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <div class="card-icon green">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div>
+                                <div class="card-title">Privacy Level</div>
+                                <div class="card-subtitle">Choose your data retention</div>
+                            </div>
+                        </div>
+                        
+                        <div class="privacy-options">
+                            <div class="privacy-option selected" data-level="balanced" onclick="selectPrivacy(this, 'balanced')">
+                                <div class="privacy-header">
+                                    <div class="privacy-radio"></div>
+                                    <div class="privacy-name">Balanced (Recommended)</div>
+                                </div>
+                                <div class="privacy-desc">Store conversations with encryption. Automatic daily backups.</div>
+                            </div>
+                            
+                            <div class="privacy-option" data-level="maximum" onclick="selectPrivacy(this, 'maximum')">
+                                <div class="privacy-header">
+                                    <div class="privacy-radio"></div>
+                                    <div class="privacy-name">Maximum Privacy</div>
+                                </div>
+                                <div class="privacy-desc">No data stored. Everything in memory only. Lost on restart.</div>
+                            </div>
+                            
+                            <div class="privacy-option" data-level="convenience" onclick="selectPrivacy(this, 'convenience')">
+                                <div class="privacy-header">
+                                    <div class="privacy-radio"></div>
+                                    <div class="privacy-name">Full Convenience</div>
+                                </div>
+                                <div class="privacy-desc">Store everything including search history and suggestions.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Storage -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <div class="card-icon orange">
+                                <i class="fas fa-archive"></i>
+                            </div>
+                            <div>
+                                <div class="card-title">Data Storage</div>
+                                <div class="card-subtitle">What to remember</div>
+                            </div>
+                        </div>
+                        
+                        <div class="toggle-list">
+                            <div class="toggle-item">
+                                <div class="toggle-info">
+                                    <h4>Conversations</h4>
+                                    <p>Save chat history</p>
+                                </div>
+                                <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                            </div>
+                            
+                            <div class="toggle-item">
+                                <div class="toggle-info">
+                                    <h4>User Preferences</h4>
+                                    <p>Theme, language, settings</p>
+                                </div>
+                                <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                            </div>
+                            
+                            <div class="toggle-item">
+                                <div class="toggle-info">
+                                    <h4>Agent Memories</h4>
+                                    <p>Personalized context per agent</p>
+                                </div>
+                                <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                            </div>
+                            
+                            <div class="toggle-item">
+                                <div class="toggle-info">
+                                    <h4>File Operations</h4>
+                                    <p>Log of file changes</p>
+                                </div>
+                                <div class="toggle-switch" onclick="toggleSwitch(this)"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Management -->
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <div class="card-icon red">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div>
+                                <div class="card-title">Data Management</div>
+                                <div class="card-subtitle">Export or delete your data</div>
+                            </div>
+                        </div>
+                        
+                        <div class="data-actions">
+                            <button class="action-btn" onclick="backupData()">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <div class="action-info">
+                                    <span class="action-title">Create Backup</span>
+                                    <span class="action-desc">Save encrypted backup to local storage</span>
+                                </div>
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                            
+                            <button class="action-btn" onclick="exportData()">
+                                <i class="fas fa-file-export"></i>
+                                <div class="action-info">
+                                    <span class="action-title">Export as JSON</span>
+                                    <span class="action-desc">Download all your data</span>
+                                </div>
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                            
+                            <button class="action-btn danger" onclick="clearConversations()">
+                                <i class="fas fa-trash"></i>
+                                <div class="action-info">
+                                    <span class="action-title">Clear Conversations</span>
+                                    <span class="action-desc">Delete all chat history</span>
+                                </div>
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                            
+                            <button class="action-btn danger" onclick="deleteAllData()">
+                                <i class="fas fa-radiation"></i>
+                                <div class="action-info">
+                                    <span class="action-title">Delete All Data</span>
+                                    <span class="action-desc">Factory reset - cannot be undone</span>
+                                </div>
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Encryption -->
+                    <div class="settings-card full-width">
+                        <div class="card-header">
+                            <div class="card-icon blue">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <div>
+                                <div class="card-title">Encryption</div>
+                                <div class="card-subtitle">Your data is protected with AES-256 encryption</div>
+                            </div>
+                        </div>
+                        
+                        <div style="background: var(--bg-tertiary); border-radius: 12px; padding: 20px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+                            <i class="fas fa-check-circle" style="color: var(--accent-green); font-size: 24px;"></i>
+                            <div style="flex: 1; min-width: 200px;">
+                                <div style="font-weight: 600; margin-bottom: 4px;">Encryption Active</div>
+                                <div style="font-size: 14px; color: var(--text-secondary);">All data is encrypted at rest with your password. Even if someone accesses your files, they cannot read them without your encryption key.</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-family: 'Orbitron', sans-serif; font-size: 12px; color: var(--text-secondary);">ENCRYPTION KEY</div>
+                                <div style="font-family: 'Orbitron', sans-serif; font-size: 16px; color: var(--accent-cyan);">••••••••••••</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function toggleSwitch(element) {
+            element.classList.toggle('active');
+        }
+
+        function selectPrivacy(element, level) {
+            document.querySelectorAll('.privacy-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            element.classList.add('selected');
+        }
+
+        function saveSettings() {
+            alert('Settings saved! Your privacy preferences have been updated.');
+        }
+
+        function backupData() {
+            alert('Creating encrypted backup... This may take a moment.');
+            setTimeout(() => {
+                alert('Backup complete! Saved to /backups/max_backup_2024.enc');
+            }, 1500);
+        }
+
+        function exportData() {
+            alert('Exporting data as JSON...');
+            setTimeout(() => {
+                alert('Download started: max_data_export.json');
+            }, 1000);
+        }
+
+        function clearConversations() {
+            if (confirm('Are you sure? This will delete all chat history permanently.')) {
+                alert('All conversations cleared.');
+            }
+        }
+
+        function deleteAllData() {
+            if (!confirm('WARNING: This will delete ALL data including settings, conversations, and memories. This cannot be undone. Continue?')) {
+                return;
+            }
+            const confirmText = prompt('Type DELETE to confirm complete data wipe:');
+            if (confirmText && confirmText.trim().toUpperCase() === 'DELETE') {
+                alert('All data deleted. MAX has been reset to factory defaults.');
+            } else {
+                alert('Deletion cancelled. Data was not modified.');
+            }
+        }
+
+        // Ctrl+S to save
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                saveSettings();
+            }
+        });
+    </script>
+</body>
+</html>

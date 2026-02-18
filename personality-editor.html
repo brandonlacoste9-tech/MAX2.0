@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personality Editor | MAX</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #050508;
+            --bg-secondary: #0a0a0f;
+            --bg-tertiary: #12121a;
+            --accent-cyan: #00d4ff;
+            --accent-purple: #7c3aed;
+            --accent-pink: #ec4899;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 20px;
+        }
+
+        .logo-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 16px 12px;
+        }
+
+        .nav-section {
+            margin-bottom: 24px;
+        }
+
+        .nav-section-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            padding: 0 12px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 4px;
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--glass);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            border-left: 3px solid var(--accent-cyan);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .top-bar {
+            height: 64px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+        }
+
+        .page-title h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-title p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .top-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--glass);
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 212, 255, 0.2);
+        }
+
+        /* Editor Layout */
+        .editor-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .editor-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr 350px;
+            gap: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Presets Panel */
+        .presets-panel {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .panel-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .preset-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preset-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent-cyan);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .preset-card:hover, .preset-card.active {
+            border-color: var(--accent-cyan);
+            transform: translateX(5px);
+        }
+
+        .preset-card.active::before {
+            opacity: 1;
+        }
+
+        .preset-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+
+        .preset-card:nth-child(2) .preset-icon { background: rgba(0, 212, 255, 0.1); }
+        .preset-card:nth-child(3) .preset-icon { background: rgba(16, 185, 129, 0.1); color: var(--accent-green); }
+        .preset-card:nth-child(4) .preset-icon { background: rgba(236, 72, 153, 0.1); color: var(--accent-pink); }
+        .preset-card:nth-child(5) .preset-icon { background: rgba(245, 158, 11, 0.1); color: var(--accent-orange); }
+
+        .preset-name {
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .preset-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        /* Editor Panel */
+        .editor-panel {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 200px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .traits-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .trait-item {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .trait-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .trait-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .trait-value {
+            font-size: 14px;
+            color: var(--accent-cyan);
+            font-weight: 700;
+        }
+
+        .trait-slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--glass);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .trait-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        /* Preview Panel */
+        .preview-panel {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .preview-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .preview-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin: 0 auto 16px;
+            position: relative;
+        }
+
+        .preview-avatar::after {
+            content: '';
+            position: absolute;
+            inset: -5px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-cyan);
+            opacity: 0.5;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0; }
+        }
+
+        .preview-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .preview-role {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .chat-preview {
+            flex: 1;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            padding: 20px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            min-height: 200px;
+        }
+
+        .preview-message {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .preview-input {
+            display: flex;
+            gap: 12px;
+        }
+
+        .preview-input input {
+            flex: 1;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Rajdhani', sans-serif;
+            outline: none;
+        }
+
+        .preview-input input:focus {
+            border-color: var(--accent-cyan);
+        }
+
+        .preview-input button {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: var(--accent-cyan);
+            border: none;
+            color: var(--bg-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .preview-input button:hover {
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 1200px) {
+            .editor-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .preview-panel {
+                grid-column: span 2;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .editor-grid {
+                grid-template-columns: 1fr;
+            }
+            .preview-panel {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">M</div>
+                    <div class="logo-text">MAX</div>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="command-center.html" class="nav-item">
+                        <i class="fas fa-home"></i>
+                        <span>Command Center</span>
+                    </a>
+                    <a href="file-browser.html" class="nav-item">
+                        <i class="fas fa-folder-open"></i>
+                        <span>File Browser</span>
+                    </a>
+                    <a href="#" class="nav-item active">
+                        <i class="fas fa-user-cog"></i>
+                        <span>Personality</span>
+                    </a>
+                    <a href="memory-settings.html" class="nav-item">
+                        <i class="fas fa-brain"></i>
+                        <span>Memory</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div class="page-title">
+                    <h1><i class="fas fa-user-cog" style="color: var(--accent-cyan); margin-right: 12px;"></i>Personality Editor</h1>
+                    <p>Customize how MAX speaks and behaves</p>
+                </div>
+                <div class="top-actions">
+                    <button class="btn btn-secondary" onclick="resetPersonality()">
+                        <i class="fas fa-undo"></i>
+                        Reset
+                    </button>
+                    <button class="btn btn-primary" onclick="savePersonality()">
+                        <i class="fas fa-save"></i>
+                        Save Changes
+                    </button>
+                </div>
+            </header>
+
+            <!-- Editor Container -->
+            <div class="editor-container">
+                <div class="editor-grid">
+                    <!-- Presets Panel -->
+                    <div class="presets-panel">
+                        <div class="panel-title">
+                            <i class="fas fa-magic" style="color: var(--accent-cyan);"></i>
+                            Presets
+                        </div>
+                        
+                        <div class="preset-card active" data-preset="professional" onclick="loadPreset(event, 'professional')">
+                            <div class="preset-icon">👔</div>
+                            <div class="preset-name">Professional</div>
+                            <div class="preset-desc">Balanced, helpful, and efficient. The default MAX experience.</div>
+                        </div>
+                        
+                        <div class="preset-card" data-preset="friendly" onclick="loadPreset(event, 'friendly')">
+                            <div class="preset-icon">😊</div>
+                            <div class="preset-name">Friendly</div>
+                            <div class="preset-desc">Warm, casual, and enthusiastic. Uses emojis and exclamation marks.</div>
+                        </div>
+                        
+                        <div class="preset-card" data-preset="expert" onclick="loadPreset(event, 'expert')">
+                            <div class="preset-icon">🧠</div>
+                            <div class="preset-name">Tech Expert</div>
+                            <div class="preset-desc">Detailed, precise, technical. Perfect for coding and architecture.</div>
+                        </div>
+                        
+                        <div class="preset-card" data-preset="creative" onclick="loadPreset(event, 'creative')">
+                            <div class="preset-icon">🎨</div>
+                            <div class="preset-name">Creative</div>
+                            <div class="preset-desc">Imaginative, artistic, expressive. Great for brainstorming.</div>
+                        </div>
+                        
+                        <div class="preset-card" data-preset="concise" onclick="loadPreset(event, 'concise')">
+                            <div class="preset-icon">⚡</div>
+                            <div class="preset-name">Concise</div>
+                            <div class="preset-desc">Brief, direct, to-the-point. No fluff, just answers.</div>
+                        </div>
+                    </div>
+
+                    <!-- Editor Panel -->
+                    <div class="editor-panel">
+                        <div class="panel-title">
+                            <i class="fas fa-sliders-h" style="color: var(--accent-purple);"></i>
+                            Character Settings
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">AI Name</label>
+                            <input type="text" class="form-input" id="aiName" value="MAX">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Role Description</label>
+                            <input type="text" class="form-input" id="aiRole" value="AI Assistant and Guru">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Greeting Message</label>
+                            <input type="text" class="form-input" id="aiGreeting" value="Greetings! I'm MAX The Guru. How can I help you today?">
+                        </div>
+
+                        <div class="traits-grid">
+                            <div class="trait-item">
+                                <div class="trait-header">
+                                    <span class="trait-name">Formality</span>
+                                    <span class="trait-value" id="formalityValue">70%</span>
+                                </div>
+                                <input type="range" class="trait-slider" id="formalitySlider" min="0" max="100" value="70" oninput="updateTrait('formality', this.value)">
+                            </div>
+                            
+                            <div class="trait-item">
+                                <div class="trait-header">
+                                    <span class="trait-name">Enthusiasm</span>
+                                    <span class="trait-value" id="enthusiasmValue">60%</span>
+                                </div>
+                                <input type="range" class="trait-slider" id="enthusiasmSlider" min="0" max="100" value="60" oninput="updateTrait('enthusiasm', this.value)">
+                            </div>
+                            
+                            <div class="trait-item">
+                                <div class="trait-header">
+                                    <span class="trait-name">Humor</span>
+                                    <span class="trait-value" id="humorValue">30%</span>
+                                </div>
+                                <input type="range" class="trait-slider" id="humorSlider" min="0" max="100" value="30" oninput="updateTrait('humor', this.value)">
+                            </div>
+                            
+                            <div class="trait-item">
+                                <div class="trait-header">
+                                    <span class="trait-name">Verbosity</span>
+                                    <span class="trait-value" id="verbosityValue">50%</span>
+                                </div>
+                                <input type="range" class="trait-slider" id="verbositySlider" min="0" max="100" value="50" oninput="updateTrait('verbosity', this.value)">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">System Prompt</label>
+                            <textarea class="form-input form-textarea" id="systemPrompt">You are MAX The Guru, a helpful AI assistant. You are knowledgeable, efficient, and always provide accurate information. You communicate clearly and professionally while remaining approachable.</textarea>
+                        </div>
+                    </div>
+
+                    <!-- Preview Panel -->
+                    <div class="preview-panel">
+                        <div class="panel-title">
+                            <i class="fas fa-eye" style="color: var(--accent-green);"></i>
+                            Live Preview
+                        </div>
+                        
+                        <div class="preview-header">
+                            <div class="preview-avatar" id="previewAvatar">🤖</div>
+                            <div class="preview-name" id="previewName">MAX</div>
+                            <div class="preview-role" id="previewRole">AI Assistant and Guru</div>
+                        </div>
+                        
+                        <div class="chat-preview" id="chatPreview">
+                            <div class="preview-message">
+                                <strong id="previewNameMsg">MAX:</strong> <span id="previewGreeting">Greetings! I'm MAX The Guru. How can I help you today?</span>
+                            </div>
+                            <div class="preview-message" style="background: transparent; border: none; padding-left: 0;">
+                                This is how your AI will greet users. Try adjusting the sliders to see the personality change!
+                            </div>
+                        </div>
+                        
+                        <div class="preview-input">
+                            <input type="text" placeholder="Test a message... (Enter to send)" id="testInput">
+                            <button onclick="testMessage()" title="Send"><i class="fas fa-paper-plane"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const presets = {
+            professional: {
+                name: 'MAX',
+                role: 'AI Assistant and Guru',
+                greeting: 'Greetings! I\'m MAX The Guru. How can I help you today?',
+                formality: 70,
+                enthusiasm: 60,
+                humor: 30,
+                verbosity: 50,
+                prompt: 'You are MAX The Guru, a helpful AI assistant. You are knowledgeable, efficient, and always provide accurate information. You communicate clearly and professionally while remaining approachable.',
+                avatar: '🤖'
+            },
+            friendly: {
+                name: 'MAX',
+                role: 'Your Friendly AI Buddy',
+                greeting: 'Hey there! 👋 So great to meet you! I\'m MAX and I\'m super excited to help you out! What can we do together today? 🚀',
+                formality: 30,
+                enthusiasm: 90,
+                humor: 60,
+                verbosity: 70,
+                prompt: 'You are MAX, a friendly and enthusiastic AI assistant. You love using emojis, exclamation marks, and making conversations fun and engaging. You\'re always positive and eager to help!',
+                avatar: '😊'
+            },
+            expert: {
+                name: 'MAX',
+                role: 'Technical Expert',
+                greeting: 'Hello. I\'m MAX, your technical assistant. I specialize in software engineering, system architecture, and complex problem-solving. What technical challenge can I assist with?',
+                formality: 90,
+                enthusiasm: 40,
+                humor: 10,
+                verbosity: 80,
+                prompt: 'You are MAX, a highly technical AI expert. You provide detailed, precise answers with code examples and technical depth. You prioritize accuracy and completeness over brevity.',
+                avatar: '🧠'
+            },
+            creative: {
+                name: 'MAX',
+                role: 'Creative Partner',
+                greeting: 'Welcome, fellow creator! 🎨 I\'m MAX, ready to explore ideas, craft stories, and bring imagination to life. What shall we create together?',
+                formality: 40,
+                enthusiasm: 85,
+                humor: 50,
+                verbosity: 75,
+                prompt: 'You are MAX, a creative and imaginative AI. You think outside the box, use vivid metaphors, and encourage creative exploration. You\'re passionate about art, writing, and innovation.',
+                avatar: '🎨'
+            },
+            concise: {
+                name: 'MAX',
+                role: 'Efficient Assistant',
+                greeting: 'Ready. What do you need?',
+                formality: 50,
+                enthusiasm: 30,
+                humor: 20,
+                verbosity: 20,
+                prompt: 'You are MAX. Be brief. Answer directly. No filler. Get to the point immediately.',
+                avatar: '⚡'
+            }
+        };
+
+        function loadPreset(evt, presetName) {
+            const preset = presets[presetName];
+            if (!preset) return;
+
+            // Update form
+            document.getElementById('aiName').value = preset.name;
+            document.getElementById('aiRole').value = preset.role;
+            document.getElementById('aiGreeting').value = preset.greeting;
+            document.getElementById('systemPrompt').value = preset.prompt;
+
+            // Update sliders
+            document.getElementById('formalitySlider').value = preset.formality;
+            document.getElementById('enthusiasmSlider').value = preset.enthusiasm;
+            document.getElementById('humorSlider').value = preset.humor;
+            document.getElementById('verbositySlider').value = preset.verbosity;
+            updateTrait('formality', preset.formality);
+            updateTrait('enthusiasm', preset.enthusiasm);
+            updateTrait('humor', preset.humor);
+            updateTrait('verbosity', preset.verbosity);
+
+            // Update preview avatar
+            document.getElementById('previewAvatar').textContent = preset.avatar;
+
+            // Update preview
+            updatePreview();
+
+            // Update active card
+            document.querySelectorAll('.preset-card').forEach(card => {
+                card.classList.toggle('active', card.dataset.preset === presetName);
+            });
+        }
+
+        function updateTrait(trait, value) {
+            document.getElementById(trait + 'Value').textContent = value + '%';
+            updatePreview();
+        }
+
+        function updatePreview() {
+            const name = document.getElementById('aiName').value;
+            const role = document.getElementById('aiRole').value;
+            const greeting = document.getElementById('aiGreeting').value;
+            
+            document.getElementById('previewName').textContent = name;
+            document.getElementById('previewRole').textContent = role;
+            document.getElementById('previewGreeting').textContent = greeting;
+            document.getElementById('previewNameMsg').textContent = name + ':';
+            
+            // Update avatar based on traits
+            const enthusiasm = parseInt(document.getElementById('enthusiasmSlider').value);
+            const formality = parseInt(document.getElementById('formalitySlider').value);
+            
+            let avatar = '🤖';
+            if (enthusiasm > 80) avatar = '😊';
+            else if (formality > 80) avatar = '🧠';
+            else if (enthusiasm < 40 && formality < 40) avatar = '⚡';
+            
+            document.getElementById('previewAvatar').textContent = avatar;
+        }
+
+        function testMessage() {
+            const input = document.getElementById('testInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            const chat = document.getElementById('chatPreview');
+            const name = document.getElementById('aiName').value;
+            
+            // Add user message (escape HTML)
+            const userDiv = document.createElement('div');
+            userDiv.className = 'preview-message';
+            userDiv.style.background = 'transparent';
+            userDiv.style.border = 'none';
+            userDiv.style.textAlign = 'right';
+            userDiv.innerHTML = '<strong>You:</strong> ' + escapeHtml(message);
+            chat.appendChild(userDiv);
+
+            // Add AI response
+            const responses = [
+                "I understand! Let me help you with that right away.",
+                "Interesting question! Here's what I think...",
+                "Absolutely! I can definitely assist with that.",
+                "Great point! Let me provide some insights."
+            ];
+            
+            const aiDiv = document.createElement('div');
+            aiDiv.className = 'preview-message';
+            aiDiv.innerHTML = '<strong>' + escapeHtml(name) + ':</strong> ' + responses[Math.floor(Math.random() * responses.length)];
+            chat.appendChild(aiDiv);
+
+            chat.scrollTop = chat.scrollHeight;
+            input.value = '';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function savePersonality() {
+            alert('Personality saved! Your AI will now respond with this character.');
+        }
+
+        function resetPersonality() {
+            if (confirm('Reset to default Professional preset?')) {
+                loadPreset(null, 'professional');
+                document.querySelector('.preset-card[data-preset="professional"]').classList.add('active');
+            }
+        }
+
+        // Enter to send test message
+        document.getElementById('testInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                testMessage();
+            }
+        });
+
+        // Ctrl+S to save
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                savePersonality();
+            }
+        });
+
+        // Listen for input changes
+        document.getElementById('aiName').addEventListener('input', updatePreview);
+        document.getElementById('aiRole').addEventListener('input', updatePreview);
+        document.getElementById('aiGreeting').addEventListener('input', updatePreview);
+
+        // Initialize
+        updatePreview();
+    </script>
+</body>
+</html>

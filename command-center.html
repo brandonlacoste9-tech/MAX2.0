@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAX Command Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&family=Noto+Sans+SC:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #050508;
+            --bg-secondary: #0a0a0f;
+            --bg-tertiary: #12121a;
+            --accent-cyan: #00d4ff;
+            --accent-purple: #7c3aed;
+            --accent-pink: #ec4899;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+
+        /* Layout */
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 20px;
+        }
+
+        .logo-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-sub {
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 16px 12px;
+            overflow-y: auto;
+        }
+
+        .nav-section {
+            margin-bottom: 24px;
+        }
+
+        .nav-section-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            padding: 0 12px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 4px;
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--glass);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            border-left: 3px solid var(--accent-cyan);
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .badge {
+            margin-left: auto;
+            background: var(--accent-purple);
+            color: white;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            height: 64px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 8px 16px;
+            width: 300px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .search-bar input {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            margin-left: 8px;
+            outline: none;
+            width: 100%;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        .top-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            position: relative;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .icon-btn:hover {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--accent-pink);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        /* Dashboard Content */
+        .dashboard {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-cyan);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .stat-icon.blue { background: rgba(0, 212, 255, 0.1); color: var(--accent-cyan); }
+        .stat-icon.purple { background: rgba(124, 58, 237, 0.1); color: var(--accent-purple); }
+        .stat-icon.green { background: rgba(16, 185, 129, 0.1); color: var(--accent-green); }
+        .stat-icon.orange { background: rgba(245, 158, 11, 0.1); color: var(--accent-orange); }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .stat-change {
+            font-size: 12px;
+            color: var(--accent-green);
+        }
+
+        /* Main Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 24px;
+        }
+
+        /* Chat Section */
+        .chat-container {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+        }
+
+        .chat-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+        }
+
+        .chat-info h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+        }
+
+        .chat-info p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 16px 20px;
+            border-radius: 16px;
+            font-size: 15px;
+            line-height: 1.6;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.bot {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--glass-border);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.user {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-time {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 8px;
+        }
+
+        .chat-input-area {
+            padding: 20px;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: var(--text-primary);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 15px;
+            resize: none;
+            min-height: 50px;
+            max-height: 150px;
+            outline: none;
+        }
+
+        .chat-input:focus {
+            border-color: var(--accent-cyan);
+        }
+
+        .input-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .send-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+        }
+
+        /* Sidebar Panels */
+        .side-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .panel {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .panel-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Agent Swarm */
+        .agent-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .agent-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .agent-item:hover, .agent-item.active {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .agent-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .agent-avatar.maximus { background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); }
+        .agent-avatar.shaolin { background: linear-gradient(135deg, #ef4444, #f97316); }
+        .agent-avatar.voyageur { background: linear-gradient(135deg, #3b82f6, #06b6d4); }
+        .agent-avatar.sage { background: linear-gradient(135deg, #8b5cf6, #ec4899); }
+        .agent-avatar.kimiclaw { background: linear-gradient(135deg, #10b981, #00d4ff); }
+
+        .agent-info {
+            flex: 1;
+        }
+
+        .agent-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .agent-role {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .agent-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            animation: pulse 2s infinite;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .quick-action {
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-action:hover {
+            border-color: var(--accent-cyan);
+            transform: translateY(-2px);
+        }
+
+        .quick-action i {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: var(--accent-cyan);
+        }
+
+        .quick-action span {
+            display: block;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Connected Services */
+        .service-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .service-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+        }
+
+        .service-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .service-icon.ollama { background: rgba(16, 185, 129, 0.1); color: var(--accent-green); }
+        .service-icon.whatsapp { background: rgba(37, 211, 102, 0.1); color: #25d366; }
+        .service-icon.telegram { background: rgba(0, 136, 204, 0.1); color: #0088cc; }
+        .service-icon.discord { background: rgba(88, 101, 242, 0.1); color: #5865f2; }
+
+        .service-info {
+            flex: 1;
+        }
+
+        .service-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .service-status {
+            font-size: 12px;
+            color: var(--accent-green);
+        }
+
+        /* Activity Feed */
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            font-size: 13px;
+        }
+
+        .activity-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--glass);
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-text {
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .activity-time {
+            font-size: 11px;
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        /* Dropdown Menus */
+        .dropdown {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background: var(--bg-secondary);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 8px;
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s;
+            z-index: 1000;
+        }
+
+        .dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background: var(--glass);
+            color: var(--text-primary);
+        }
+
+        /* Command Palette */
+        .command-palette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 100px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+            z-index: 2000;
+        }
+
+        .command-palette.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .palette-container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .palette-input-wrapper {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .palette-input {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 18px;
+            outline: none;
+            margin-left: 12px;
+        }
+
+        .palette-items {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .palette-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .palette-item:hover, .palette-item.selected {
+            background: var(--glass);
+        }
+
+        .palette-item i {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            color: var(--accent-cyan);
+        }
+
+        .palette-item-info {
+            flex: 1;
+        }
+
+        .palette-item-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .palette-item-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .palette-shortcut {
+            font-size: 13px;
+            color: var(--text-secondary);
+            background: var(--bg-tertiary);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        /* Voice Modal */
+        .voice-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 3000;
+        }
+
+        .voice-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .voice-container {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .voice-wave {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 40px;
+            position: relative;
+        }
+
+        .voice-wave::before,
+        .voice-wave::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid var(--accent-cyan);
+            animation: ripple 2s infinite;
+        }
+
+        .voice-wave::before {
+            width: 250px;
+            height: 250px;
+        }
+
+        .voice-wave::after {
+            width: 300px;
+            height: 300px;
+            animation-delay: 0.5s;
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        .voice-wave i {
+            font-size: 60px;
+            color: white;
+        }
+
+        .voice-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .voice-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+        }
+
+        .voice-actions {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .voice-btn {
+            padding: 16px 40px;
+            border-radius: 12px;
+            border: none;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .voice-btn.cancel {
+            background: var(--glass);
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
+        }
+
+        .voice-btn.send {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            .side-panel {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                z-index: 100;
+            }
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">M</div>
+                    <div>
+                        <div class="logo-text">MAX</div>
+                        <div class="logo-sub">月之暗面 Moonshot AI</div>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="#" class="nav-item active">
+                        <i class="fas fa-home"></i>
+                        <span>Command Center</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-comments"></i>
+                        <span>Chat History</span>
+                        <span class="badge">3</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-tasks"></i>
+                        <span>Tasks</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-robot"></i>
+                        <span>Agent Swarm</span>
+                        <span class="badge">8</span>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Tools</div>
+                    <a href="file-browser.html" class="nav-item">
+                        <i class="fas fa-folder-open"></i>
+                        <span>File Browser</span>
+                    </a>
+                    <a href="personality-editor.html" class="nav-item">
+                        <i class="fas fa-user-cog"></i>
+                        <span>Personality</span>
+                    </a>
+                    <a href="memory-settings.html" class="nav-item">
+                        <i class="fas fa-brain"></i>
+                        <span>Memory</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Vault</span>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">System</div>
+                    <a href="#" class="nav-item" onclick="showSettings()">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                    <a href="login.html" class="nav-item">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Sign Out</span>
+                    </a>
+                </div>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>All Systems Online</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div class="top-bar-left">
+                    <div class="search-bar">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search tasks, agents, or press ⌘K..." id="searchInput">
+                    </div>
+                </div>
+                <div class="top-actions">
+                    <button class="icon-btn" onclick="toggleTheme()" title="Toggle Theme">
+                        <i class="fas fa-sun" id="themeIcon"></i>
+                    </button>
+                    <button class="icon-btn" onclick="showCommandPalette()" title="Command Palette (⌘K)">
+                        <i class="fas fa-keyboard"></i>
+                    </button>
+                    <button class="icon-btn" onclick="toggleNotifications()" style="position: relative;">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    <div class="user-avatar" onclick="toggleUserMenu()">U</div>
+                    
+                    <!-- User Dropdown -->
+                    <div class="dropdown" id="userDropdown">
+                        <div class="dropdown-item" onclick="showProfile()">
+                            <i class="fas fa-user"></i>
+                            <span>Profile</span>
+                        </div>
+                        <div class="dropdown-item" onclick="showSettings()">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </div>
+                        <div class="dropdown-item" onclick="showBilling()">
+                            <i class="fas fa-credit-card"></i>
+                            <span>Billing</span>
+                        </div>
+                        <div class="dropdown-item" onclick="showApiKeys()">
+                            <i class="fas fa-key"></i>
+                            <span>API Keys</span>
+                        </div>
+                        <div class="dropdown-item" onclick="showHelp()">
+                            <i class="fas fa-question-circle"></i>
+                            <span>Help & Support</span>
+                        </div>
+                        <div class="dropdown-item" onclick="signOut()">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Sign Out</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard -->
+            <div class="dashboard">
+                <!-- Stats Row -->
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon blue"><i class="fas fa-comment-dots"></i></div>
+                        </div>
+                        <div class="stat-value" id="msgCount">2,847</div>
+                        <div class="stat-label">Messages Today</div>
+                        <div class="stat-change">+12% from yesterday</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon purple"><i class="fas fa-bolt"></i></div>
+                        </div>
+                        <div class="stat-value">1.2s</div>
+                        <div class="stat-label">Avg Response</div>
+                        <div class="stat-change">-0.3s faster</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon green"><i class="fas fa-robot"></i></div>
+                        </div>
+                        <div class="stat-value">8/8</div>
+                        <div class="stat-label">Active Agents</div>
+                        <div class="stat-change">All online</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon orange"><i class="fas fa-dollar-sign"></i></div>
+                        </div>
+                        <div class="stat-value">$847</div>
+                        <div class="stat-label">Cost Saved</div>
+                        <div class="stat-change">vs OpenAI API</div>
+                    </div>
+                </div>
+
+                <!-- Main Grid -->
+                <div class="main-grid">
+                    <!-- Chat Section -->
+                    <div class="chat-container">
+                        <div class="chat-header">
+                            <div class="chat-title">
+                                <div class="chat-avatar">M</div>
+                                <div class="chat-info">
+                                    <h3>MAX The Guru</h3>
+                                    <p>Agent Swarm Coordinator • Online</p>
+                                </div>
+                            </div>
+                            <div class="chat-actions">
+                                <button class="icon-btn" onclick="showVoiceModal()" title="Voice Input">
+                                    <i class="fas fa-microphone"></i>
+                                </button>
+                                <button class="icon-btn" onclick="clearChat()" title="Clear Chat">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                <button class="icon-btn" onclick="showSettings()" title="Settings">
+                                    <i class="fas fa-cog"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="chat-messages" id="chatMessages">
+                            <div class="message bot">
+                                <div>Greetings! I'm MAX The Guru, your personal AI assistant powered by local Ollama models and the Agent Swarm. I can help you with:</div>
+                                <div style="margin-top: 12px;">
+                                    • Write & debug code<br>
+                                    • Generate images<br>
+                                    • Analyze documents<br>
+                                    • Browse the web<br>
+                                    • Manage files<br>
+                                    • And much more...
+                                </div>
+                                <div class="message-time">Just now</div>
+                            </div>
+                        </div>
+                        
+                        <div class="chat-input-area">
+                            <div class="chat-input-wrapper">
+                                <textarea class="chat-input" id="chatInput" placeholder="Type your message... (Press Enter to send, Shift+Enter for new line)" rows="1"></textarea>
+                                <div class="input-actions">
+                                    <button class="icon-btn" onclick="attachFile()" title="Attach File">
+                                        <i class="fas fa-paperclip"></i>
+                                    </button>
+                                    <button class="send-btn" onclick="sendMessage()" title="Send Message">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Side Panel -->
+                    <div class="side-panel">
+                        <!-- Agent Swarm -->
+                        <div class="panel">
+                            <div class="panel-header">
+                                <div class="panel-title">
+                                    <i class="fas fa-robot" style="color: var(--accent-cyan);"></i>
+                                    Agent Swarm
+                                </div>
+                                <span style="font-size: 12px; color: var(--text-secondary);">8 active</span>
+                            </div>
+                            <div class="agent-list">
+                                <div class="agent-item active" onclick="switchAgent(event, 'maximus')">
+                                    <div class="agent-avatar maximus">👑</div>
+                                    <div class="agent-info">
+                                        <div class="agent-name">MAXIMUS</div>
+                                        <div class="agent-role">Emperor / Coordinator</div>
+                                    </div>
+                                    <div class="agent-status"></div>
+                                </div>
+                                <div class="agent-item" onclick="switchAgent(event, 'shaolin')">
+                                    <div class="agent-avatar shaolin">🛡️</div>
+                                    <div class="agent-info">
+                                        <div class="agent-name">Shaolin Guard</div>
+                                        <div class="agent-role">Security</div>
+                                    </div>
+                                    <div class="agent-status"></div>
+                                </div>
+                                <div class="agent-item" onclick="switchAgent(event, 'voyageur')">
+                                    <div class="agent-avatar voyageur">🧭</div>
+                                    <div class="agent-info">
+                                        <div class="agent-name">Voyageur</div>
+                                        <div class="agent-role">Travel & Logistics</div>
+                                    </div>
+                                    <div class="agent-status"></div>
+                                </div>
+                                <div class="agent-item" onclick="switchAgent(event, 'sage')">
+                                    <div class="agent-avatar sage">📚</div>
+                                    <div class="agent-info">
+                                        <div class="agent-name">Sage</div>
+                                        <div class="agent-role">Research & Knowledge</div>
+                                    </div>
+                                    <div class="agent-status"></div>
+                                </div>
+                                <div class="agent-item" onclick="switchAgent(event, 'kimiclaw')">
+                                    <div class="agent-avatar kimiclaw">🐾</div>
+                                    <div class="agent-info">
+                                        <div class="agent-name">KimiClaw</div>
+                                        <div class="agent-role">Messaging Gateway</div>
+                                    </div>
+                                    <div class="agent-status"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="panel">
+                            <div class="panel-header">
+                                <div class="panel-title">
+                                    <i class="fas fa-bolt" style="color: var(--accent-orange);"></i>
+                                    Quick Actions
+                                </div>
+                            </div>
+                            <div class="quick-actions">
+                                <div class="quick-action" onclick="quickAction('image')">
+                                    <i class="fas fa-image"></i>
+                                    <span>Generate Image</span>
+                                </div>
+                                <div class="quick-action" onclick="quickAction('code')">
+                                    <i class="fas fa-code"></i>
+                                    <span>Write Code</span>
+                                </div>
+                                <div class="quick-action" onclick="quickAction('summarize')">
+                                    <i class="fas fa-compress-alt"></i>
+                                    <span>Summarize</span>
+                                </div>
+                                <div class="quick-action" onclick="quickAction('browse')">
+                                    <i class="fas fa-globe"></i>
+                                    <span>Browse Web</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Connected Services -->
+                        <div class="panel">
+                            <div class="panel-header">
+                                <div class="panel-title">
+                                    <i class="fas fa-plug" style="color: var(--accent-green);"></i>
+                                    Connected
+                                </div>
+                            </div>
+                            <div class="service-list">
+                                <div class="service-item">
+                                    <div class="service-icon ollama"><i class="fas fa-brain"></i></div>
+                                    <div class="service-info">
+                                        <div class="service-name">Ollama</div>
+                                        <div class="service-status">llama3.2:latest</div>
+                                    </div>
+                                </div>
+                                <div class="service-item">
+                                    <div class="service-icon whatsapp"><i class="fab fa-whatsapp"></i></div>
+                                    <div class="service-info">
+                                        <div class="service-name">WhatsApp</div>
+                                        <div class="service-status">Connected</div>
+                                    </div>
+                                </div>
+                                <div class="service-item">
+                                    <div class="service-icon telegram"><i class="fab fa-telegram"></i></div>
+                                    <div class="service-info">
+                                        <div class="service-name">Telegram</div>
+                                        <div class="service-status">@max_guru_bot</div>
+                                    </div>
+                                </div>
+                                <div class="service-item">
+                                    <div class="service-icon discord"><i class="fab fa-discord"></i></div>
+                                    <div class="service-info">
+                                        <div class="service-name">Discord</div>
+                                        <div class="service-status">MAX#1234</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Activity -->
+                        <div class="panel">
+                            <div class="panel-header">
+                                <div class="panel-title">
+                                    <i class="fas fa-history" style="color: var(--accent-purple);"></i>
+                                    Activity
+                                </div>
+                            </div>
+                            <div class="activity-list">
+                                <div class="activity-item">
+                                    <div class="activity-icon"><i class="fas fa-code"></i></div>
+                                    <div class="activity-content">
+                                        <div class="activity-text">Generated Python script</div>
+                                        <div class="activity-time">2 minutes ago</div>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon"><i class="fas fa-image"></i></div>
+                                    <div class="activity-content">
+                                        <div class="activity-text">Created image with DALL-E</div>
+                                        <div class="activity-time">15 minutes ago</div>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon"><i class="fas fa-download"></i></div>
+                                    <div class="activity-content">
+                                        <div class="activity-text">Downloaded llama3.2 model</div>
+                                        <div class="activity-time">1 hour ago</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Command Palette -->
+    <div class="command-palette" id="commandPalette">
+        <div class="palette-container">
+            <div class="palette-input-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" class="palette-input" id="paletteInput" placeholder="Type a command or search...">
+                <span style="color: var(--text-secondary); font-size: 13px;">ESC to close</span>
+            </div>
+            <div class="palette-items" id="paletteItems">
+                <div class="palette-item selected" onclick="executeCommand('agents')">
+                    <i class="fas fa-robot"></i>
+                    <div class="palette-item-info">
+                        <div class="palette-item-title">Go to Agents</div>
+                        <div class="palette-item-desc">Manage your AI agent swarm</div>
+                    </div>
+                    <span class="palette-shortcut">G+A</span>
+                </div>
+                <div class="palette-item" onclick="executeCommand('models')">
+                    <i class="fas fa-brain"></i>
+                    <div class="palette-item-info">
+                        <div class="palette-item-title">Go to Models</div>
+                        <div class="palette-item-desc">Manage Ollama models</div>
+                    </div>
+                    <span class="palette-shortcut">G+M</span>
+                </div>
+                <div class="palette-item" onclick="executeCommand('vault')">
+                    <i class="fas fa-shield-alt"></i>
+                    <div class="palette-item-info">
+                        <div class="palette-item-title">Open Vault</div>
+                        <div class="palette-item-desc">Access your secrets</div>
+                    </div>
+                    <span class="palette-shortcut">G+V</span>
+                </div>
+                <div class="palette-item" onclick="executeCommand('image')">
+                    <i class="fas fa-image"></i>
+                    <div class="palette-item-info">
+                        <div class="palette-item-title">Generate Image</div>
+                        <div class="palette-item-desc">Create AI-generated images</div>
+                    </div>
+                    <span class="palette-shortcut">⌘+I</span>
+                </div>
+                <div class="palette-item" onclick="executeCommand('code')">
+                    <i class="fas fa-code"></i>
+                    <div class="palette-item-info">
+                        <div class="palette-item-title">Write Code</div>
+                        <div class="palette-item-desc">Generate code in any language</div>
+                    </div>
+                    <span class="palette-shortcut">⌘+C</span>
+                </div>
+                <div class="palette-item" onclick="executeCommand('clear')">
+                    <i class="fas fa-trash"></i>
+                    <div class="palette-item-info">
+                        <div class="palette-item-title">Clear Chat</div>
+                        <div class="palette-item-desc">Clear current conversation</div>
+                    </div>
+                    <span class="palette-shortcut">⌘+K</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Voice Modal -->
+    <div class="voice-modal" id="voiceModal">
+        <div class="voice-container">
+            <div class="voice-wave">
+                <i class="fas fa-microphone"></i>
+            </div>
+            <div class="voice-text">Listening...</div>
+            <div class="voice-subtitle">Speak now. Your voice is processed locally.</div>
+            <div class="voice-actions">
+                <button class="voice-btn cancel" onclick="closeVoiceModal()">Cancel</button>
+                <button class="voice-btn send" onclick="sendVoiceMessage()">Send Message</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Chat functionality
+        const chatInput = document.getElementById('chatInput');
+        const chatMessages = document.getElementById('chatMessages');
+        let messageCount = 2847;
+
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        chatInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 150) + 'px';
+        });
+
+        function sendMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            // Add user message
+            addMessage(message, 'user');
+            chatInput.value = '';
+            chatInput.style.height = 'auto';
+
+            // Update count
+            messageCount++;
+            document.getElementById('msgCount').textContent = messageCount.toLocaleString();
+
+            // Simulate bot response
+            setTimeout(() => {
+                const responses = [
+                    "I'm processing your request. This would connect to your local Ollama instance in the full version.",
+                    "Interesting! Let me think about that... In the deployed version, this would use your local AI models.",
+                    "I can help with that! The Agent Swarm would delegate this to the appropriate specialist.",
+                    "Great question! With the local setup, your data never leaves your machine."
+                ];
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                addMessage(randomResponse, 'bot');
+            }, 1000);
+        }
+
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.textContent = text;
+            
+            const timeDiv = document.createElement('div');
+            timeDiv.className = 'message-time';
+            timeDiv.textContent = 'Just now';
+            
+            messageDiv.appendChild(contentDiv);
+            messageDiv.appendChild(timeDiv);
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Quick actions
+        function quickAction(type) {
+            const actions = {
+                image: 'Generate an image of ',
+                code: 'Write code for ',
+                summarize: 'Summarize this: ',
+                browse: 'Browse the web for '
+            };
+            chatInput.value = actions[type];
+            chatInput.focus();
+        }
+
+        // Agent switching
+        function switchAgent(evt, agent) {
+            document.querySelectorAll('.agent-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            evt.currentTarget.classList.add('active');
+            
+            const agentNames = {
+                maximus: 'MAXIMUS',
+                shaolin: 'Shaolin Guard',
+                voyageur: 'Voyageur',
+                sage: 'Sage',
+                kimiclaw: 'KimiClaw'
+            };
+            
+            addMessage(`Switched to ${agentNames[agent]}. How can I assist you?`, 'bot');
+        }
+
+        // Command Palette
+        function showCommandPalette() {
+            document.getElementById('commandPalette').classList.add('show');
+            document.getElementById('paletteInput').focus();
+        }
+
+        function hideCommandPalette() {
+            document.getElementById('commandPalette').classList.remove('show');
+        }
+
+        function executeCommand(cmd) {
+            hideCommandPalette();
+            const actions = {
+                agents: () => alert('Navigate to Agents page'),
+                models: () => window.open('http://localhost:8081', '_blank'),
+                vault: () => window.open('http://localhost:3003', '_blank'),
+                image: () => quickAction('image'),
+                code: () => quickAction('code'),
+                clear: () => clearChat()
+            };
+            if (actions[cmd]) actions[cmd]();
+        }
+
+        // Voice modal
+        function showVoiceModal() {
+            document.getElementById('voiceModal').classList.add('show');
+        }
+
+        function closeVoiceModal() {
+            document.getElementById('voiceModal').classList.remove('show');
+        }
+
+        function sendVoiceMessage() {
+            closeVoiceModal();
+            addMessage('Voice message transcribed: "Hey MAX, can you help me with something?"', 'user');
+            setTimeout(() => {
+                addMessage("Of course! I'm ready to help. What do you need?", 'bot');
+            }, 1000);
+        }
+
+        // User menu
+        function toggleUserMenu() {
+            document.getElementById('userDropdown').classList.toggle('show');
+        }
+
+        function showProfile() { alert('Profile modal would open'); }
+        function showSettings() { alert('Settings modal would open'); }
+        function showBilling() { alert('Billing modal would open'); }
+        function showApiKeys() { alert('API Keys modal would open'); }
+        function showHelp() { alert('Help modal would open'); }
+        function signOut() { window.location.href = 'login.html'; }
+
+        // Other functions
+        function toggleTheme() {
+            const icon = document.getElementById('themeIcon');
+            if (icon.classList.contains('fa-sun')) {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            } else {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            }
+        }
+
+        function toggleNotifications() {
+            alert('Notifications panel would open');
+        }
+
+        function clearChat() {
+            chatMessages.innerHTML = '';
+            addMessage('Chat cleared. How can I help you?', 'bot');
+        }
+
+        function attachFile() {
+            alert('File attachment would open');
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                hideCommandPalette();
+                closeVoiceModal();
+                document.getElementById('userDropdown').classList.remove('show');
+            }
+            
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                showCommandPalette();
+            }
+        });
+
+        // Click outside to close dropdowns
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.top-actions')) {
+                document.getElementById('userDropdown').classList.remove('show');
+            }
+        });
+
+        // Update message count periodically
+        setInterval(() => {
+            messageCount++;
+            document.getElementById('msgCount').textContent = messageCount.toLocaleString();
+        }, 30000);
+    </script>
+</body>
+</html>
