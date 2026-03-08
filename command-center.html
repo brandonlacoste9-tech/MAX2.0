@@ -1448,29 +1448,102 @@
         });
 
         function sendMessage() {
-            const message = chatInput.value.trim();
-            if (!message) return;
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+            input.value = '';
+            input.style.height = 'auto';
+            addMessage(text, 'user');
+            callOllama(text);
+        }
 
-            // Add user message
-            addMessage(message, 'user');
-            chatInput.value = '';
-            chatInput.style.height = 'auto';
+        // Conversation history for context
+        const conversationHistory = [];
 
-            // Update count
-            messageCount++;
-            document.getElementById('msgCount').textContent = messageCount.toLocaleString();
+        const agentSystemPrompts = {
+            maximus: 'You are MAXIMUS, a powerful AI assistant. You are direct, capable, and get things done. Help the user accomplish their goals.',
+            shaolin: 'You are Shaolin Guard, a disciplined and wise AI assistant. You provide thoughtful, structured guidance.',
+            voyageur: 'You are Voyageur, an adventurous AI assistant. You are creative, exploratory, and help users discover new possibilities.',
+            sage: 'You are Sage, a calm and knowledgeable AI assistant. You provide deep insights and wisdom.',
+            kimiclaw: 'You are KimiClaw, a sharp and technical AI assistant. You excel at code, analysis, and technical tasks.',
+        };
 
-            // Simulate bot response
-            setTimeout(() => {
-                const responses = [
-                    "I'm processing your request. This would connect to your local Ollama instance in the full version.",
-                    "Interesting! Let me think about that... In the deployed version, this would use your local AI models.",
-                    "I can help with that! The Agent Swarm would delegate this to the appropriate specialist.",
-                    "Great question! With the local setup, your data never leaves your machine."
-                ];
-                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-                addMessage(randomResponse, 'bot');
-            }, 1000);
+        function getActiveAgent() {
+            const active = document.querySelector('.agent-item.active');
+            return active ? active.dataset.agent || 'maximus' : 'maximus';
+        }
+
+        async function callOllama(userMessage) {
+            const ollamaUrl = 'https://suspected-arbitrary-hey-dist.trycloudflare.com/v1/chat/completions';
+            const agent = getActiveAgent();
+            const systemPrompt = agentSystemPrompts[agent] || agentSystemPrompts.maximus;
+
+            conversationHistory.push({ role: 'user', content: userMessage });
+
+            const messages = [
+                { role: 'system', content: systemPrompt },
+                ...conversationHistory.slice(-20)
+            ];
+
+            // Add typing indicator
+            const typingId = 'typing-' + Date.now();
+            const chatMessages = document.getElementById('chatMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot';
+            typingDiv.id = typingId;
+            typingDiv.innerHTML = '<span class="typing-dots">&#8226;&#8226;&#8226;</span>';
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            try {
+                const response = await fetch(ollamaUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ollama' },
+                    body: JSON.stringify({
+                        model: 'minimax-m2.5:cloud',
+                        messages: messages,
+                        stream: true
+                    })
+                });
+
+                if (!response.ok) throw new Error('API error: ' + response.status);
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let fullReply = '';
+
+                // Replace typing indicator with empty message div
+                typingDiv.innerHTML = '';
+                typingDiv.className = 'message bot';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    const chunk = decoder.decode(value, { stream: true });
+                    const lines = chunk.split('
+');
+                    for (const line of lines) {
+                        if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+                            try {
+                                const data = JSON.parse(line.slice(6));
+                                const delta = data.choices?.[0]?.delta?.content || '';
+                                if (delta) {
+                                    fullReply += delta;
+                                    typingDiv.textContent = fullReply;
+                                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                                }
+                            } catch(e) {}
+                        }
+                    }
+                }
+
+                conversationHistory.push({ role: 'assistant', content: fullReply });
+
+            } catch (err) {
+                typingDiv.textContent = 'Error: ' + err.message + '. Is the Ollama tunnel running?';
+                typingDiv.style.color = '#ff4444';
+            }
+        }, 1000);
         }
 
         function addMessage(text, sender) {
@@ -1554,10 +1627,9 @@
 
         function sendVoiceMessage() {
             closeVoiceModal();
-            addMessage('Voice message transcribed: "Hey MAX, can you help me with something?"', 'user');
-            setTimeout(() => {
-                addMessage("Of course! I'm ready to help. What do you need?", 'bot');
-            }, 1000);
+            const voiceText = 'Hey MAX, can you help me with something?';
+            addMessage('Voice: ' + voiceText, 'user');
+            callOllama(voiceText);
         }
 
         // User menu
